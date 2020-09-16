@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <title>瓜果超市</title>
+
+  <style>
+    .el-col {
+      border-radius: 4px;
+    }
+
+    .bg-purple-dark {
+      background: #99a9bf;
+    }
+
+    .bg-purple {
+      background: #d3dce6;
+    }
+
+    .bg-purple-light {
+      background: #e5e9f2;
+    }
+
+    .grid-content {
+      border-radius: 4px;
+      min-height: 36px;
+    }
+
+
+    .btn-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+
+    .el-header {
+      background-color: #B3C0D1;
+      color: #333;
+      line-height: 60px;
+      text-align: center;
+    }
+
+
+    .list-container,
+    .input-container {
+      margin: 20px 0px 20px 0px;
+    }
+
+    .row-container {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <div class="input-container">
+      <el-row :gutter="10">
+        <el-col :xs="18" :sm="18" :md="18" :lg="18" :xl="18">
+          <el-input v-model="msg" placeholder="请输入代办的事情"> </el-input>
+        </el-col>
+        <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6" class="btn-container">
+          <el-button @click='addItem' type="primary">Add</el-button>
+        </el-col>
+      </el-row>
+    </div>
+
+    <el-header>todoList</el-header>
+
+    <div class="list-container">
+      <el-row :gutter="10" v-if="list" v-for="item in list" class="row-container">
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <el-input v-model="item.msg" :disabled="item.done" @change="inputChange(item)"></el-input>
+        </el-col>
+
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10" class="btn-container">
+          <span @click='reverse(item)'>
+            <el-button v-if="item.done" type="success">done</el-button>
+            <el-button v-else type="info">undone</el-button>
+          </span>
+          <el-button type="danger" @click='deleteItem(item)'>delete</el-button>
+        </el-col>
+      </el-row>
+    </div>
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: "#app",
+      data: {
+        list: null,
+        msg: '',
+      },
+      methods: {
+        async getList(page) {
+          this.list = (await axios.get('/api/todoList')).data
+        },
+        async addItem() {
+          const ret = await axios.post(
+            '/api/todoList', {
+              msg: this.msg,
+              done: false
+            }
+          )
+          this.getList();
+        },
+        async deleteItem(item) {
+          // console.log('you want to delete:', item)
+          const ret = await axios.delete('/api/todoList/' + item._id)
+          // console.log('ret:', ret.data.data)
+
+          this.getList();
+        },
+        async modifyItem(item) {    //保存数据到服务器
+          const ret = await axios.put('/api/todoList', item)
+        },
+        async reverse(item) {
+          // console.log('item:', item.done)
+          item.done = !item.done;
+
+          this.modifyItem(item)
+          // this.getList();
+        },
+        inputChange(item){
+          // console.log("--->value",item.msg)
+          this.modifyItem(item)
+
+        }
+      },
+      async mounted() {
+        this.getList();
+      },
+    });
+  </script>
+</body>
+
+</html>
