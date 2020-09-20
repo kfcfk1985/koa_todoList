@@ -1,5 +1,6 @@
 # How to use the TodoList
 
++ when you use windows,install the redis,then open the cmd ,input:redis-server 
 + Create a new local mongoose database called 'test', but don't create any collection. 
 + While inside the activity folder, run npm install in terminal.
 + enter base folder,run:node index.js 
