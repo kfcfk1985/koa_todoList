@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <title>瓜果超市</title>
+
+  <style>
+    .input-container,
+    .btn-container {
+      margin-bottom: 10px;
+    }
+
+    .input-name {
+      border-radius: 4px;
+      border: 2px solid #DCDFE6;
+      height: 36px;
+
+      display: inline-block;
+      line-height: 36px;
+      width: 100%;
+      text-align: center;
+    }
+
+
+    .btn-item {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <div class="input-container" v-for="item in inputLists">
+      <el-row :gutter="10">
+        <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6">
+          <span class="input-name">{{item.name}}</span>
+        </el-col>
+
+        <el-col :xs="18" :sm="18" :md="18" :lg="18" :xl="18">
+          <el-input v-model="item.value" :placeholder="item.placeholder"> </el-input>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="btn-container">
+      <el-row :gutter="10">
+        <el-col v-for="item in btnList" class="btn-item" :xs="btnColumnSize" :sm="btnColumnSize" :md="btnColumnSize"
+          :lg="btnColumnSize" :xl="btnColumnSize">
+          <el-button class="btn-name" @click="btnClickFun(item)">{{item.name}}</span>
+        </el-col>
+      </el-row>
+    </div>
+
+
+    <div class="log-container">
+      <p>请求日志</p>
+      <ul>
+        <template v-for="item in logs">
+          <li>{{item}}</li>
+        </template>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+
+    axios.interceptors.response.use(response=>{
+      console.log("拦截器拦截返回的数据:",response)
+      app.logs.push(response.data)
+      return response;
+    })
+    var app = new Vue({
+      el: "#app",
+      data: {
+        inputLists: [{
+            value: "ldf",
+            name: "账号:",
+            placeholder: "请输入登陆账号",
+          },
+          {
+            value: "123",
+            name: "密码:",
+            placeholder: "请输入登陆密码",
+          }
+        ],
+        btnList: [{
+            name: "登陆",
+            type: "login"
+          },
+          {
+            name: "登出",
+            type: "logout"
+          },
+          {
+            name: "获取当前用户",
+            type: "getUser"
+          },
+          {
+            name: "清空日志",
+            type: "clearLog"
+          }
+        ],
+        logs: []
+      },
+      methods: {
+        async btnClickFun(item) {
+          let ret;
+          console.log("你点击了:", item)
+
+          switch (item.type) {
+            case "login":
+              axios.post("/api/log/in", {
+                name: this.inputLists[0].value,
+                pwd: this.inputLists[1].value
+              })
+            
+              break;
+
+            case "logout":
+              axios.get("/api/log/out")
+             
+              break;
+
+            case "getUser":
+             await axios.get("/api/log/getUser")
+            
+              break;
+
+            case "clearLog":
+              this.logs = []
+              break;
+
+            default:
+              break;
+          }
+        }
+      },
+      computed: {
+        btnColumnSize() {
+          return Math.ceil(24 / this.btnList.length)
+        }
+      },
+      async mounted() {
+
+      },
+    });
+  </script>
+</body>
+
+</html>
