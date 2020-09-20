@@ -1,5 +1,7 @@
 const Router = require("koa-router")
 
+//引入redis配置文件
+const redisClient = require("../middleware/redis_config.js").client
 
 const router = new Router({
     prefix: '/api/log'
@@ -10,8 +12,20 @@ const router = new Router({
 router.post("/in", async (ctx, next) => {
     console.log('\n\r接收到的参数', ctx.request.body)
 
+
     var date = new Date();
     console.log("当前系统时间:", date);
+
+
+    redisClient.keys("*",(err,keys)=>{
+        keys.forEach(key=>{
+            console.log("\n\rredis table:");
+            redisClient.get(key,(err,value)=>{
+                console.log(`${key}    :    ${value}`);
+            })
+        })
+    })
+
 
     let obj = ctx.request.body;
     // ctx.cookies.set("user", obj.name, {
@@ -19,6 +33,8 @@ router.post("/in", async (ctx, next) => {
     // })
 
     ctx.session.user = obj.name;
+
+    
 
 
     //增加数据
@@ -35,10 +51,10 @@ router.get("/out", async (ctx, next) => {
     // ctx.cookies.set( "user", null )
     // ctx.cookies.set( "user.sig", null )
 
-    ctx.cookies.set( "koa.sess", null )
-    ctx.cookies.set( "koa.sess.sig", null )
+    // ctx.cookies.set( "koa.sess", null )
+    // ctx.cookies.set( "koa.sess.sig", null )
     
-    delete ctx.session.user;
+    ctx.session = null;     //把session清空，就可以把cookie清空；若脸上了redis，也会清空
 
     ctx.body = {
         ok: 1,

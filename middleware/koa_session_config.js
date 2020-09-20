@@ -1,6 +1,10 @@
 const session = require('koa-session');
 
 
+//引入redis配置文件
+const redisStore = require("./redis_config.js").store
+
+
 const CONFIG = {
     key: 'koa.sess', /** (string) cookie key (default is koa.sess) */
     /** (number || 'session') maxAge in ms (default is 1 days) */
@@ -15,6 +19,7 @@ const CONFIG = {
     renew: false, /** (boolean) renew session when session is nearly expired, so we can always keep user logged in. (default is false)*/
     secure: false, /** (boolean) secure cookie*/
     sameSite: null, /** (string) session cookie sameSite options (default null, don't set it) */
+    store :redisStore,
   };
 
 

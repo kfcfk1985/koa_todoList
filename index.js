@@ -4,6 +4,8 @@ const app = new koa();
 //引入koa-session配置文件
 require("./middleware/koa_session_config.js")(app)
 
+
+
 // 可以 通过 ctx.request.body  获取请求的数据
 const koaBody = require('koa-body')
 app.use(koaBody());
