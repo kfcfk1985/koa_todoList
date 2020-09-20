@@ -3,8 +3,9 @@
 + Create a new local mongoose database called 'test', but don't create any collection. 
 + While inside the activity folder, run npm install in terminal.
 + enter base folder,run:node index.js 
-+ Open http://localhost:3000/ and start adding your todos to the list!
-
++ Open http://localhost:3000/ and press 'login' 
++ then press 'F5' to refresh you browser
++ you can add you todo item now!
 
 
 
