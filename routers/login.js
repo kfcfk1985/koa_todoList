@@ -14,9 +14,12 @@ router.post("/in", async (ctx, next) => {
     console.log("当前系统时间:", date);
 
     let obj = ctx.request.body;
-    ctx.cookies.set("user", obj.name, {
-        maxAge: 24 * 60 * 60 * 1000 //cookie 有效时间，1天.需要转化为毫秒单位
-    })
+    // ctx.cookies.set("user", obj.name, {
+    //     maxAge: 24 * 60 * 60 * 1000 //cookie 有效时间，1天.需要转化为毫秒单位
+    // })
+
+    ctx.session.user = obj.name;
+
 
     //增加数据
     ctx.body = {
@@ -29,7 +32,13 @@ router.post("/in", async (ctx, next) => {
 router.get("/out", async (ctx, next) => {
 
     //设置 user 的值为null，就可以cookie中的 user 
-    ctx.cookies.set( "user", null )
+    // ctx.cookies.set( "user", null )
+    // ctx.cookies.set( "user.sig", null )
+
+    ctx.cookies.set( "koa.sess", null )
+    ctx.cookies.set( "koa.sess.sig", null )
+    
+    delete ctx.session.user;
 
     ctx.body = {
         ok: 1,
@@ -40,7 +49,8 @@ router.get("/out", async (ctx, next) => {
 
 router.get("/getUser",
     (ctx, next) => {
-        let name = ctx.cookies.get("user");
+        // let name = ctx.cookies.get("user");
+        let name = ctx.session.user;
         console.log("当前登陆的用户名:", name);
         if (name == undefined) {
             ctx.body = {
@@ -52,7 +62,8 @@ router.get("/getUser",
         }
     },
     async (ctx, next) => {
-        let name = ctx.cookies.get("user");
+        // let name = ctx.cookies.get("user");
+        let name = ctx.session.user;
         ctx.body = {
             ok: 1,
             data: `当前登陆的用户是:${name}`
